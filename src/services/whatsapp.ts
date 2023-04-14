@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const WHATSAPP_TOKEN = process.env.WHATSAPP_TOKEN;
-
+const WHATSAPP_GRAPH_URL = 'https://graph.facebook.com/v16.0'
 export const sendWhatsAppMessage = async (
   phone_number_id: string,
   from: string,
@@ -10,7 +10,7 @@ export const sendWhatsAppMessage = async (
   try {
     return axios({
       method: "POST", // Required, HTTP method, a string, e.g. POST, GET
-      url: `https://graph.facebook.com/v12.0/${phone_number_id}/messages?access_token=${WHATSAPP_TOKEN}`,
+      url: `${WHATSAPP_GRAPH_URL}/${phone_number_id}/messages?access_token=${WHATSAPP_TOKEN}`,
       data: {
         messaging_product: "whatsapp",
         to: from,
@@ -22,3 +22,27 @@ export const sendWhatsAppMessage = async (
     console.error(error);
   }
 };
+
+
+
+export const markWhatsAppMessageAsRead = async (
+  phoneNumber: string,
+  messageId: string
+) => {
+  try {
+    return axios({
+      method: "POST", // Required, HTTP method, a string, e.g. POST, GET
+      url: `${WHATSAPP_GRAPH_URL}/${phoneNumber}/messages?access_token=${WHATSAPP_TOKEN}`,
+      data: {
+        messaging_product: "whatsapp",
+        message_id: messageId,
+        status: 'read'
+      },
+      headers: { "Content-Type": "application/json" },
+    });
+  } catch (error) {
+    console.error(error);
+  }
+};
+
+

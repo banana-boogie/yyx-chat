@@ -3,6 +3,7 @@ dotenv.config();
 import express from "express";
 import bodyParser from "body-parser";
 
+// import cache from "./data/cache";
 import router from "./routes";
 
 const app = express().use(bodyParser.json()); // creates express http server
