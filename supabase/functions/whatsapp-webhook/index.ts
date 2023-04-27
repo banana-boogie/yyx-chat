@@ -77,7 +77,7 @@ const handleWhatsAppEvent = async (req: Request) => {
       });
     }
 
-    console.log(`WhatsApp Message from: ${profileName} #${from}. Message ID: ${messageId}}`);
+    console.log(`WhatsApp Message from: ${profileName} #${from}. Message: ${msg_body}`);
 
     // Check if user exists
     const { data: userExists, error: userExistsError } = await supabase
@@ -116,7 +116,7 @@ const handleWhatsAppEvent = async (req: Request) => {
         .from('messages')
         .select('message')
         .eq('user_id', userId)
-        .gte('inserted_at', oneDayAgo.toISOString())
+        .lte('inserted_at', oneDayAgo.toISOString())
         .order('inserted_at', { ascending: false })
         .limit(5);
 
