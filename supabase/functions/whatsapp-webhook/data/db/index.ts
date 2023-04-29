@@ -1,5 +1,4 @@
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
-import { Database } from '../../../types/supabase.ts';
  
 
 // Create a single supabase client for interacting with your database

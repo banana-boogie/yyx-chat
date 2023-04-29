@@ -4,17 +4,18 @@ const WHATSAPP_TOKEN = Deno.env.get('WHATSAPP_TOKEN');
 const WHATSAPP_GRAPH_URL = 'https://graph.facebook.com/v16.0'
 export const sendWhatsAppMessage = async (
   phone_number_id: string,
-  from: string,
+  phoneNumber: string,
   message: string
 ) => {
   try {
-    // DEBUG:  console.log(`Sending message to ${from}`)
+    // DEBUG
+    console.log(`Sending WhatsApp Message sent to ${phoneNumber}: ${message}`);
     return axios({
       method: 'POST', // Required, HTTP method, a string, e.g. POST, GET
       url: `${WHATSAPP_GRAPH_URL}/${phone_number_id}/messages?access_token=${WHATSAPP_TOKEN}`,
       data: {
         messaging_product: 'whatsapp',
-        to: from,
+        to: phoneNumber,
         text: { body: message },
       },
       headers: { 'Content-Type': 'application/json' },
@@ -32,7 +33,8 @@ export const markWhatsAppMessageAsRead = async (
   messageId: string
 ) => {
   try {
-    //  DEBUG:  console.log(`Marking message as read to ${phoneNumber}`);
+    // DEBUG
+    // console.log(`Marking message as read to ${phoneNumber}`);
     return axios({
       method: 'POST', // Required, HTTP method, a string, e.g. POST, GET
       url: `${WHATSAPP_GRAPH_URL}/${phoneNumber}/messages?access_token=${WHATSAPP_TOKEN}`,

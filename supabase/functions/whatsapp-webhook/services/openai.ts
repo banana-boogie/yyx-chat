@@ -20,13 +20,15 @@ export const getOpenAIResponse = async (prompt: string | string[]): Promise<stri
       ? prompt.map((message) => ({ role: 'user', content: message }))
       : [{ role: 'user', content: prompt }];
 
+    // DEBUG
+    console.log(`OpenAI message prompts: ${JSON.stringify(prompts)}`)
     const completion = await openai.createChatCompletion({
       model: "gpt-3.5-turbo",
       max_tokens: 1000,
       messages: [
         {
           role: 'system',
-          content: `You are an assistant that helps thermomix customers for Yummy Yummix in Mexico.\
+          content: `You are an assistant that helps thermomix customers for YummyYummix in Mexico.\
           Most customers will speak in Spanish but some may speak other languages such as English.
           Respond in the language the user speaks to you in.`,
         },
