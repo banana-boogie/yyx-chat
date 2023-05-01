@@ -27,7 +27,7 @@ export async function getMessages(userId: number, { limit } = { limit: 5 }): Pro
 
   messagesResponse.forEach((entry) => {
     if (entry.message !== null) {
-      messages.push(entry.message);
+      messages.unshift(entry.message);
     }
   });
 

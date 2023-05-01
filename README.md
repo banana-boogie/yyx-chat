@@ -14,8 +14,11 @@ This chat assistant sends messages through WhatsApp and uses OpenAI to respond t
   - WhatsApp API
 
 ## Running the Project
+  - Obtain an [OpenAI API key](https://platform.openai.com/account/api-keys)
+  - Obtain a [WhatsApp access token](https://developers.facebook.com/docs/whatsapp/cloud-api/get-started)
   - Copy the .env.example file to .env and fill in the required environment variables.
   - Install Supabase CLI.
+  - Install [ngrok](https://ngrok.com/) - this is used to create a tunnel to your localhost that is running the Supabase edge function. Use the ngrok url in the webhook config when setting up the WhatsApp API.
 
 ### Running locally
 - `supabase login`
