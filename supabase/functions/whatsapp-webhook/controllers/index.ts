@@ -1,5 +1,5 @@
-import handleWhatsAppEvent from './handleWhatsAppEvent';
-import verifyWhatsAppWebhook from './verifyWhatsAppWebhook'
+import handleWhatsAppEvent from './handleWhatsAppEvent.ts';
+import verifyWhatsAppWebhook from './verifyWhatsAppWebhook.ts'
 
 
 export { handleWhatsAppEvent, verifyWhatsAppWebhook }

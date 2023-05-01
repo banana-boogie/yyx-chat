@@ -1,18 +1,18 @@
-import { getOpenAIResponse } from '../services/openai';
-import { getUserIdByPhoneNumber, createUser } from '../data/user';
-import { getMessages, saveMessage, saveOpenAiResponse } from '../data/message';
-import { markWhatsAppMessageAsRead, sendWhatsAppMessage } from '../services/whatsapp';
+import debug from '../utils/debug.ts';
+
+import { getOpenAIResponse } from '../services/openai.ts';
+import { getUserIdByPhoneNumber, createUser } from '../data/user.ts';
+import { getMessages, saveMessage, saveOpenAiResponse } from '../data/message.ts';
+import { markWhatsAppMessageAsRead, sendWhatsAppMessage } from '../services/whatsapp.ts';
 
 export default async function handleWhatsAppEvent(req: Request) {
   // Parse the request body from the POST
   const body = await req.json();
 
   // Check the Incoming webhook message
-  // DEBUG
-  //  console.log(JSON.stringify(body, null, 2));
+  debug(JSON.stringify(body, null, 2));
 
   if (!body || !body?.object || !body?.entry) {
-    console.warn('WhatsApp event not valid');
     return new Response('WhatsApp webhook event is not valid ', { status: 404 });
   }
 
@@ -28,12 +28,12 @@ export default async function handleWhatsAppEvent(req: Request) {
 
   try {
     if (!profileName) {
-      console.log(`WhatsApp Event is not a text message from a user. Ignoring it.`);
-      return new Response('WhatsApp Event is not a text message from a user. Ignoring it.', { status: 200 });
-    }
-
-    if (messageType !== 'text') {
-      console.warn(`WhatsApp Message from: ${profileName} #${phoneNumber} is of type ${messageType}. Ignoring it.`);
+      debug('WhatsApp Event is not a User Message. Ignoring it.');
+      return new Response('Received non-user WhatApp message event', {
+        status: 200,
+      });
+    } else if (messageType !== 'text') {
+      debug(`WhatsApp Message from: ${profileName} #${phoneNumber} is of type ${messageType}. Ignoring it.`);
       await markWhatsAppMessageAsRead(phoneNumberId, whatsAppMessageId);
       await sendWhatsAppMessage(
         phoneNumberId,
@@ -54,13 +54,25 @@ export default async function handleWhatsAppEvent(req: Request) {
   }
 }
 
-async function handleWhatsAppTextMessage({ profileName, phoneNumber, messageBody, phoneNumberId, whatsAppMessageId }) {
+async function handleWhatsAppTextMessage({
+  profileName,
+  phoneNumber,
+  messageBody,
+  phoneNumberId,
+  whatsAppMessageId,
+}: {
+  profileName: string;
+  phoneNumber: string;
+  messageBody: string;
+  phoneNumberId: string;
+  whatsAppMessageId: string;
+}) {
   console.log(`WhatsApp Message from: ${profileName} #${phoneNumber}. Message: ${messageBody}`);
   try {
     let userId = await getUserIdByPhoneNumber(phoneNumber);
 
     if (!userId) {
-      userId = await createUser(phoneNumber, profileName);
+      userId = await createUser(profileName, phoneNumber);
     }
 
     const previousMessages = await getMessages(userId);

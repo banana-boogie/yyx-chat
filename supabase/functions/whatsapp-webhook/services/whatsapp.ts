@@ -1,14 +1,10 @@
 import axios from 'https://esm.sh/axios@1.3.5';
+import debug from '../utils/debug.ts';
 
 const WHATSAPP_TOKEN = Deno.env.get('WHATSAPP_TOKEN');
-const WHATSAPP_GRAPH_URL = 'https://graph.facebook.com/v16.0'
-export const sendWhatsAppMessage = async (
-  phone_number_id: string,
-  phoneNumber: string,
-  message: string
-) => {
+const WHATSAPP_GRAPH_URL = 'https://graph.facebook.com/v16.0';
+export const sendWhatsAppMessage = (phone_number_id: string, phoneNumber: string, message: string) => {
   try {
-    // DEBUG
     console.log(`Sending WhatsApp Message sent to ${phoneNumber}: ${message}`);
     return axios({
       method: 'POST', // Required, HTTP method, a string, e.g. POST, GET
@@ -26,15 +22,9 @@ export const sendWhatsAppMessage = async (
   }
 };
 
-
-
-export const markWhatsAppMessageAsRead = async (
-  phoneNumber: string,
-  messageId: string
-) => {
+export const markWhatsAppMessageAsRead = (phoneNumber: string, messageId: string) => {
   try {
-    // DEBUG
-    // console.log(`Marking message as read to ${phoneNumber}`);
+    debug(`Marking message as read to ${phoneNumber}`);
     return axios({
       method: 'POST', // Required, HTTP method, a string, e.g. POST, GET
       url: `${WHATSAPP_GRAPH_URL}/${phoneNumber}/messages?access_token=${WHATSAPP_TOKEN}`,
@@ -50,5 +40,3 @@ export const markWhatsAppMessageAsRead = async (
     throw new Error('Error sending message');
   }
 };
-
-
