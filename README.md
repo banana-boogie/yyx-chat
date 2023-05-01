@@ -1,44 +1,70 @@
 # YYX Chat
 This chat assistant sends messages through WhatsApp and uses OpenAI to respond to the user messages.
 
-## Dependencies
-  - Deno v1.15.3
-  - Supabase
-  - OpenAI API
-
-## Running the Project
-  - Copy the .env.example file to .env and fill in the required environment variables.
-  - Install Supabase CLI.
-
-  ### Running locally
-  - `supabase login`
-  - `supabase start`
-  - `supabase functions serve whatsapp-webhook --env-file ./supabase/.env.local --debug --no-verify-jwt`
-
-  ### Deploy function
-  - `supabase functions deploy whatsapp-webhook --no-verify-jwt`
-  ### Set Env Variables in Prod
-  - `supabase secrets set --env-file ./supabase/.env`
-
 ## Features
-
   - Responds to incoming text messages
   - Saves the user's name, phone number, and WhatsApp ID to a database
   - Fetches the previous five messages sent by the user within the last 24 hours
   - Generates a response using OpenAI's GPT-3 API
 
-## Contributing
-## Database Migrations
+## Dependencies
+  - Deno v1.15.3
+  - Supabase
+  - OpenAI API
+  - WhatsApp API
 
+## Running the Project
+  - Obtain an [OpenAI API key](https://platform.openai.com/account/api-keys)
+  - Obtain a [WhatsApp access token](https://developers.facebook.com/docs/whatsapp/cloud-api/get-started)
+  - Copy the .env.example file to .env and fill in the required environment variables.
+  - Install Supabase CLI.
+  - Install [ngrok](https://ngrok.com/) - this is used to create a tunnel to your localhost that is running the Supabase edge function. Use the ngrok url in the webhook config when setting up the WhatsApp API.
+
+### Running locally
+- `supabase login`
+- `supabase start`
+-  Link to the (test) project: `supabase link --project-ref <project-id>`
+- `supabase functions serve whatsapp-webhook --env-file ./supabase/.env.local --debug --no-verify-jwt`
+- `supabase status`
+
+### Deploy function to Prod
+-  Link to the (prod) project: `supabase link --project-ref <project-id>`
+- `supabase functions deploy whatsapp-webhook --no-verify-jwt`
+### Set Env Variables 
+- `supabase secrets set --env-file ./supabase/.env`
+
+### Database Migrations
 - Create new migration: `supabase migrations new new_table_name`
+- Run migrations locally: `supbase db reset`
 
+### Creating migrations using the table editor
+- Use `supabase status` to get the link to the admin panel.
+- Navigate to the table editor and make your changes.
+- Run this command to get the sql output needed to add to the migration file: `supabase db diff --schema public`
+- Create new migration file: `supabase migrations new new_table_name`
+- Copy/Paste diff.
+
+### Deploying migrations
+- Deploy migrations to prod: `supabase 
+[Supabase Docs Reference](https://supabase.com/docs/guides/getting-started/local-development#deploy-your-project)
+```
+supabase link --project-ref <project-id>
+# You can get <project-id> from your project's dashboard URL: https://app.supabase.com/project/<project-id>
+
+supabase db remote commit
+# Capture any changes that you have made to your remote database before you went through the steps above
+# If you have not made any changes to the remote database, skip this step
+
+# Deploy changes
+supabase db push
+```
 
 ## License
 
 This project is licensed under the MIT License.
 
 
-## Documentation
+## AI Documentation
 
 This is a TypeScript code snippet that listens to incoming messages from WhatsApp and logs the events in the console. It uses Deno as a runtime environment, which is a secure JavaScript and TypeScript runtime built on V8. The code is designed to be run on a server and leverages the following modules:
 
