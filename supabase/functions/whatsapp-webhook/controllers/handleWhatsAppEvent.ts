@@ -1,9 +1,12 @@
-import debug from '../utils/debug.ts';
+import { ChatCompletionRequestMessage } from 'https://esm.sh/openai@3.2.1';
 
+import debug from '../utils/debug.ts';
 import { getOpenAIResponse } from '../services/openai.ts';
 import { getUserIdByPhoneNumber, createUser } from '../data/user.ts';
-import { getMessages, saveMessage, saveOpenAiResponse } from '../data/message.ts';
+import { getMessages, saveMessage, updateMessage } from '../data/message.ts';
 import { markWhatsAppMessageAsRead, sendWhatsAppMessage } from '../services/whatsapp.ts';
+import { formatPromptsFromMessages } from '../utils/index.ts';
+import { calculatePromptCost } from '../utils/index.ts';
 
 export default async function handleWhatsAppEvent(req: Request) {
   // Parse the request body from the POST
@@ -75,14 +78,21 @@ async function handleWhatsAppTextMessage({
       userId = await createUser(profileName, phoneNumber);
     }
 
-    const previousMessages = await getMessages(userId);
+    const previousMessages = await getMessages(userId, { limit: 6 });
 
     const messageId = await saveMessage(userId, messageBody);
 
     // Send the messages to OpenAI
-    const messages = [...previousMessages, messageBody];
-    const openAiResponse: string = await getOpenAIResponse(messages);
-    await saveOpenAiResponse(messageId, openAiResponse);
+    const prompts: ChatCompletionRequestMessage[] = [
+      ...formatPromptsFromMessages(previousMessages),
+      { role: 'user', content: messageBody } as ChatCompletionRequestMessage,
+    ];
+
+    const openAiResponse: string = await getOpenAIResponse(prompts);
+    const promptCost = calculatePromptCost(prompts);
+    debug(`Prompt cost: ${promptCost}`);
+
+    await updateMessage(messageId, { openAiResponse, cost: promptCost });
 
     await markWhatsAppMessageAsRead(phoneNumberId, whatsAppMessageId);
     await sendWhatsAppMessage(phoneNumberId, phoneNumber, openAiResponse);
