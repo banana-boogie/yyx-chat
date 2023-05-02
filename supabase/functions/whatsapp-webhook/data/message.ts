@@ -64,22 +64,28 @@ export async function saveMessage(userId: number, message: string): Promise<numb
 }
 
 // function to update the Message in supabase
-export async function saveOpenAiResponse(messageId: number, openAiResponse: string): Promise<number> {
+type updateMessageData = {
+  openAiResponse?: string;
+  cost?: number;
+};
+export async function updateMessage(messageId: number, updateData: updateMessageData): Promise<number> {
+  const { openAiResponse, cost } = updateData;
   const { error, data } = await supabase
     .from('messages')
     .update({
       openai_response: openAiResponse,
+      cost: cost,
     })
     .eq('id', messageId)
     .select();
 
   if (error) {
-    console.error(`Error updating message to Supabase: ${error}`);
+    console.error(`Error updating message to Supabase: ${JSON.stringify(error)}`);
     throw error;
   }
 
   if (data && !data.length) {
-    console.error(`Error updating message to Supabase: ${error}`);
+    console.error(`Error updating message to Supabase: ${JSON.stringify(error)}`);
     throw new Error('Error updating message to Supabase');
   }
 

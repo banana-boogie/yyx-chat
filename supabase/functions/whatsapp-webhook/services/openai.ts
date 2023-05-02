@@ -1,9 +1,11 @@
-import debug from '../utils/debug.ts';
 import { ChatCompletionRequestMessage, Configuration, OpenAIApi } from 'https://esm.sh/openai@3.2.1';
+
+import debug from '../utils/debug.ts';
 
 const configuration = new Configuration({
   apiKey: Deno.env.get('OPENAI_API_KEY'),
 });
+
 const openai = new OpenAIApi(configuration);
 
 type prompts = ChatCompletionRequestMessage[];
