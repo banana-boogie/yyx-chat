@@ -1,22 +1,20 @@
 import debug from '../utils/debug.ts';
-import { ChatCompletionResponseMessage, Configuration, OpenAIApi } from 'https://esm.sh/openai@3.2.1';
+import { ChatCompletionRequestMessage, Configuration, OpenAIApi } from 'https://esm.sh/openai@3.2.1';
 
 const configuration = new Configuration({
   apiKey: Deno.env.get('OPENAI_API_KEY'),
 });
 const openai = new OpenAIApi(configuration);
 
+type prompts = ChatCompletionRequestMessage[];
+
 // Call OpenAI API to get a response, taking in the message from WhatsApp
-export const getOpenAIResponse = async (prompt: string | string[]): Promise<string> => {
+export const getOpenAIResponse = async (prompts: prompts): Promise<string> => {
   if (!configuration.apiKey) {
     throw new Error('OpenAI API key not configured, please follow instructions in README.md');
   }
 
   try {
-    const prompts: ChatCompletionResponseMessage[] = Array.isArray(prompt)
-      ? prompt.map((message) => ({ role: 'user', content: message }))
-      : [{ role: 'user', content: prompt }];
-
     debug(`OpenAI message prompts: ${JSON.stringify(prompts)}`);
     const completion = await openai.createChatCompletion({
       model: 'gpt-3.5-turbo',
@@ -30,7 +28,7 @@ export const getOpenAIResponse = async (prompt: string | string[]): Promise<stri
         },
         ...prompts,
       ],
-      temperature: 0.6,
+      temperature: 0.8,
     });
 
     const chatResponse = completion.data.choices[0].message?.content;

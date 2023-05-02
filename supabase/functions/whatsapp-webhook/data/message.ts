@@ -1,13 +1,15 @@
 import supabase from './db/index.ts';
 import debug from '../utils/debug.ts';
 
-export async function getMessages(userId: number, { limit } = { limit: 5 }): Promise<string[]> {
+export type messageResponse = { message: string; openAiResponse: string }[];
+
+export async function getMessages(userId: number, { limit } = { limit: 5 }): Promise<messageResponse> {
   // Get previous messages from Supabase
   const oneDayAgo = new Date(Date.now() - 24 * 60 * 60 * 1000); // One day ago
 
   const { data: messagesResponse, error: previousMessagesError } = await supabase
     .from('messages')
-    .select('message')
+    .select('message, openai_response')
     .eq('user_id', userId)
     .gte('inserted_at', oneDayAgo.toISOString())
     .order('inserted_at', { ascending: false })
@@ -23,15 +25,16 @@ export async function getMessages(userId: number, { limit } = { limit: 5 }): Pro
     return [];
   }
 
-  const messages: string[] = [];
+  const messages: messageResponse = [];
 
+  // reverse the order to get a chronological list of messages
   messagesResponse.forEach((entry) => {
-    if (entry.message !== null) {
-      messages.unshift(entry.message);
+    if (entry.message !== null && entry.openai_response !== null) {
+      messages.unshift({ message: entry.message, openAiResponse: entry.openai_response });
     }
   });
 
-  debug(`Previous messages found: ${messages}`);
+  debug(`Previous messages found: ${JSON.stringify(messages)}`);
 
   return messages;
 }
